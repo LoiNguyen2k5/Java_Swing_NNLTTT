@@ -1,6 +1,6 @@
 package com.mis.ui;
 
-import com.mis.dao.StudentDAO;
+import com.mis.service.StudentService;
 import com.mis.entity.Student;
 
 import javax.swing.*;
@@ -20,10 +20,10 @@ public class StudentFrame extends JFrame {
     // Thêm 2 nút bấm mới cho Lambda
     private JButton btnAdd, btnUpdate, btnDelete, btnRefresh, btnSearch, btnFilterStatus, btnCountMale;
 
-    private StudentDAO studentDAO;
+    private StudentService studentService;
 
     public StudentFrame() {
-        studentDAO = new StudentDAO();
+        studentService = new StudentService();
 
         setTitle("Quản lý Học Viên");
         setSize(1000, 650); // Tăng chiều cao lên một chút để chứa thêm dòng nút bấm
@@ -32,7 +32,7 @@ public class StudentFrame extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents();
-        loadDataToTable(studentDAO.getAllStudents());
+        loadDataToTable(studentService.getAllStudents());
     }
 
     private void initComponents() {
@@ -148,9 +148,9 @@ public class StudentFrame extends JFrame {
             }
             Student st = new Student(txtName.getText().trim(), new Date(), cbGender.getSelectedItem().toString(),
                     txtPhone.getText().trim(), txtEmail.getText().trim(), txtAddress.getText().trim(), cbStatus.getSelectedItem().toString());
-            studentDAO.addStudent(st);
+            studentService.addStudent(st);
             JOptionPane.showMessageDialog(this, "Thêm thành công!");
-            clearForm(); loadDataToTable(studentDAO.getAllStudents());
+            clearForm(); loadDataToTable(studentService.getAllStudents());
         });
 
         btnUpdate.addActionListener(e -> {
@@ -167,9 +167,9 @@ public class StudentFrame extends JFrame {
             st.setAddress(txtAddress.getText().trim());
             st.setStatus(cbStatus.getSelectedItem().toString());
 
-            studentDAO.updateStudent(st);
+            studentService.updateStudent(st);
             JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
-            clearForm(); loadDataToTable(studentDAO.getAllStudents());
+            clearForm(); loadDataToTable(studentService.getAllStudents());
         });
 
         btnDelete.addActionListener(e -> {
@@ -177,14 +177,14 @@ public class StudentFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Chọn học viên để xóa!"); return;
             }
             if (JOptionPane.showConfirmDialog(this, "Chắc chắn xóa?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                studentDAO.deleteStudent(Long.parseLong(txtId.getText()));
+                studentService.deleteStudent(Long.parseLong(txtId.getText()));
                 JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                clearForm(); loadDataToTable(studentDAO.getAllStudents());
+                clearForm(); loadDataToTable(studentService.getAllStudents());
             }
         });
 
         btnRefresh.addActionListener(e -> {
-            clearForm(); loadDataToTable(studentDAO.getAllStudents());
+            clearForm(); loadDataToTable(studentService.getAllStudents());
         });
 
         // --- SỰ KIỆN LAMBDA YÊU CẦU CỦA GIÁO VIÊN ---
@@ -193,9 +193,9 @@ public class StudentFrame extends JFrame {
         btnSearch.addActionListener(e -> {
             String keyword = txtSearch.getText().trim();
             if (keyword.isEmpty()) {
-                loadDataToTable(studentDAO.getAllStudents());
+                loadDataToTable(studentService.getAllStudents());
             } else {
-                List<Student> result = studentDAO.searchStudentsByName(keyword);
+                List<Student> result = studentService.searchStudentsByName(keyword);
                 loadDataToTable(result);
             }
         });
@@ -203,14 +203,14 @@ public class StudentFrame extends JFrame {
         // Lambda 2: Lọc theo trạng thái đang được chọn ở ô ComboBox "Trạng thái"
         btnFilterStatus.addActionListener(e -> {
             String selectedStatus = cbStatus.getSelectedItem().toString();
-            List<Student> result = studentDAO.getStudentsByStatus(selectedStatus);
+            List<Student> result = studentService.getStudentsByStatus(selectedStatus);
             loadDataToTable(result);
             JOptionPane.showMessageDialog(this, "Đã lọc danh sách các học viên có trạng thái: " + selectedStatus);
         });
 
         // Lambda 3: Đếm tổng số học viên Nam
         btnCountMale.addActionListener(e -> {
-            long count = studentDAO.countMaleStudents();
+            long count = studentService.countMaleStudents();
             JOptionPane.showMessageDialog(this, 
                     "Tổng số học viên Nam (Male) hiện tại trong hệ thống là: " + count + " học viên.", 
                     "Kết quả đếm (Java Lambda)", 

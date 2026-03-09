@@ -1,6 +1,6 @@
 package com.mis.ui;
 
-import com.mis.dao.ClassDAO;
+import com.mis.service.ClassService;
 import com.mis.entity.SchoolClass;
 
 import javax.swing.*;
@@ -23,11 +23,11 @@ public class ClassFrame extends JFrame {
     // Nút Lambda
     private JButton btnSearch, btnFilterStatus;
 
-    private ClassDAO classDAO;
+    private ClassService classService;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     public ClassFrame() {
-        classDAO = new ClassDAO();
+        classService = new ClassService();
 
         setTitle("Quản lý Lớp Học");
         setSize(1000, 650);
@@ -36,7 +36,7 @@ public class ClassFrame extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents();
-        loadDataToTable(classDAO.getAllClasses());
+        loadDataToTable(classService.getAllClasses());
     }
 
     private void initComponents() {
@@ -143,63 +143,80 @@ public class ClassFrame extends JFrame {
         add(bottomWrapper, BorderLayout.SOUTH);
 
         // --- SỰ KIỆN CRUD ---
+       // SỰ KIỆN NÚT THÊM MỚI
         btnAdd.addActionListener(e -> {
             try {
                 SchoolClass sc = new SchoolClass(
-                        txtName.getText().trim(), Long.parseLong(txtCourseId.getText().trim()),
+                        txtName.getText().trim(), 
+                        Long.parseLong(txtCourseId.getText().trim()),
                         txtTeacherId.getText().isEmpty() ? null : Long.parseLong(txtTeacherId.getText().trim()),
                         sdf.parse(txtStartDate.getText().trim()),
                         txtEndDate.getText().isEmpty() ? null : sdf.parse(txtEndDate.getText().trim()),
-                        Integer.parseInt(txtMaxStudent.getText().trim()), cbStatus.getSelectedItem().toString()
+                        Integer.parseInt(txtMaxStudent.getText().trim()), 
+                        cbStatus.getSelectedItem().toString()
                 );
-                classDAO.addClass(sc);
+                classService.addClass(sc);
                 JOptionPane.showMessageDialog(this, "Thêm lớp học thành công!");
-                clearForm(); loadDataToTable(classDAO.getAllClasses());
+                clearForm(); loadDataToTable(classService.getAllClasses());
+                
+            } catch (NumberFormatException ex) {
+                // Bắt lỗi khi nhập chữ vào ô ID hoặc Sĩ số
+                JOptionPane.showMessageDialog(this, "Lỗi: ID Khóa Học, ID Giáo Viên và Sĩ số phải là các con số hợp lệ!", "Sai định dạng số", JOptionPane.WARNING_MESSAGE);
+            } catch (java.text.ParseException ex) {
+                // Bắt lỗi khi nhập sai định dạng ngày tháng
+                JOptionPane.showMessageDialog(this, "Lỗi: Ngày tháng phải nhập đúng định dạng năm-tháng-ngày (VD: 2026-03-08)!", "Sai định dạng ngày", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi! Ngày tháng (yyyy-MM-dd) và ID phải là số.");
+                JOptionPane.showMessageDialog(this, "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
+        // SỰ KIỆN NÚT CẬP NHẬT (Áp dụng tương tự)
         btnUpdate.addActionListener(e -> {
             if (txtId.getText().isEmpty()) return;
             try {
                 SchoolClass sc = new SchoolClass();
                 sc.setClassId(Long.parseLong(txtId.getText()));
-                sc.setClassName(txtName.getText().trim()); sc.setCourseId(Long.parseLong(txtCourseId.getText().trim()));
+                sc.setClassName(txtName.getText().trim()); 
+                sc.setCourseId(Long.parseLong(txtCourseId.getText().trim()));
                 sc.setTeacherId(txtTeacherId.getText().isEmpty() ? null : Long.parseLong(txtTeacherId.getText().trim()));
                 sc.setStartDate(sdf.parse(txtStartDate.getText().trim()));
                 sc.setEndDate(txtEndDate.getText().isEmpty() ? null : sdf.parse(txtEndDate.getText().trim()));
-                sc.setMaxStudent(Integer.parseInt(txtMaxStudent.getText().trim())); sc.setStatus(cbStatus.getSelectedItem().toString());
+                sc.setMaxStudent(Integer.parseInt(txtMaxStudent.getText().trim())); 
+                sc.setStatus(cbStatus.getSelectedItem().toString());
 
-                classDAO.updateClass(sc);
+                classService.updateClass(sc);
                 JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
-                clearForm(); loadDataToTable(classDAO.getAllClasses());
+                clearForm(); loadDataToTable(classService.getAllClasses());
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: Kiểm tra lại các ô ID và Sĩ số, yêu cầu nhập số!", "Sai định dạng số", JOptionPane.WARNING_MESSAGE);
+            } catch (java.text.ParseException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: Ngày tháng phải đúng định dạng yyyy-MM-dd!", "Sai định dạng ngày", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi định dạng dữ liệu!");
+                JOptionPane.showMessageDialog(this, "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
-
         btnDelete.addActionListener(e -> {
             if (!txtId.getText().isEmpty() && JOptionPane.showConfirmDialog(this, "Chắc chắn xóa?") == 0) {
-                classDAO.deleteClass(Long.parseLong(txtId.getText()));
-                clearForm(); loadDataToTable(classDAO.getAllClasses());
+                classService.deleteClass(Long.parseLong(txtId.getText()));
+                clearForm(); loadDataToTable(classService.getAllClasses());
             }
         });
 
-        btnRefresh.addActionListener(e -> { clearForm(); loadDataToTable(classDAO.getAllClasses()); });
+        btnRefresh.addActionListener(e -> { clearForm(); loadDataToTable(classService.getAllClasses()); });
 
         // --- SỰ KIỆN LAMBDA ---
         
         // Lambda 1: Tìm kiếm theo tên
         btnSearch.addActionListener(e -> {
             String kw = txtSearch.getText().trim();
-            loadDataToTable(kw.isEmpty() ? classDAO.getAllClasses() : classDAO.searchClassByName(kw));
+            loadDataToTable(kw.isEmpty() ? classService.getAllClasses() : classService.searchClassByName(kw));
         });
 
         // Lambda 2: Lọc theo Trạng thái đang chọn ở ComboBox
         btnFilterStatus.addActionListener(e -> {
             String selectedStatus = cbStatus.getSelectedItem().toString();
-            List<SchoolClass> result = classDAO.getClassesByStatus(selectedStatus);
+            List<SchoolClass> result = classService.getClassesByStatus(selectedStatus);
             loadDataToTable(result);
             JOptionPane.showMessageDialog(this, "Đã lọc danh sách Lớp học có trạng thái: " + selectedStatus);
         });

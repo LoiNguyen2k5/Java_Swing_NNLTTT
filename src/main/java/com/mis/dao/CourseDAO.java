@@ -65,34 +65,4 @@ public class CourseDAO {
             e.printStackTrace();
         }
     }
-
-    // =========================================================================
-    // JAVA LAMBDAS CHO MODULE COURSE (ĐÁP ỨNG YÊU CẦU GIÁO VIÊN)
-    // =========================================================================
-
-    // Lambda 1: Tìm kiếm khóa học theo tên
-    public List<Course> searchCoursesByName(String keyword) {
-        List<Course> allCourses = getAllCourses();
-        // Dùng stream() để lọc các khóa học có tên chứa từ khóa
-        return allCourses.stream()
-                .filter(c -> c.getCourseName().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    // Lambda 2: Lọc khóa học theo cấp độ (VD: Beginner, Intermediate)
-    public List<Course> filterCoursesByLevel(String level) {
-        List<Course> allCourses = getAllCourses();
-        return allCourses.stream()
-                .filter(c -> c.getLevel() != null && c.getLevel().equalsIgnoreCase(level))
-                .collect(Collectors.toList());
-    }
-
-    // Lambda 3: Tìm khóa học có học phí nhỏ hơn một mức giá nhất định
-    public List<Course> getCoursesCheaperThan(double maxFee) {
-        List<Course> allCourses = getAllCourses();
-        return allCourses.stream()
-                // Chuyển BigDecimal sang double để so sánh
-                .filter(c -> c.getFee() != null && c.getFee().doubleValue() <= maxFee)
-                .collect(Collectors.toList());
-    }
 }
