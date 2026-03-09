@@ -25,7 +25,7 @@ public class Attendance {
     @Column(name = "status", nullable = false) // Trạng thái: Present (Có mặt), Absent (Vắng), Late (Trễ)
     private String status = "Present";
 
-    @Column(name = "note") // Ghi chú thêm (ví dụ: Lý do vắng)
+    @Column(name = "note") // Ghi chú thêm 
     private String note;
 
     // Constructor rỗng bắt buộc cho Hibernate

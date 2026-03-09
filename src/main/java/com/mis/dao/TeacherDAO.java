@@ -65,27 +65,5 @@ public class TeacherDAO {
     }
 
 
-    // Lambda 4: Tìm kiếm giáo viên theo tên (Không phân biệt hoa thường)
-    public List<Teacher> searchTeachersByName(String keyword) {
-        List<Teacher> allTeachers = getAllTeachers();
-        return allTeachers.stream()
-                .filter(t -> t.getFullName().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    // Lambda 5: Lọc giáo viên theo chuyên môn (Ví dụ: IELTS, TOEIC)
-    public List<Teacher> getTeachersBySpecialty(String specialty) {
-        List<Teacher> allTeachers = getAllTeachers();
-        return allTeachers.stream()
-                .filter(t -> t.getSpecialty() != null && t.getSpecialty().equalsIgnoreCase(specialty))
-                .collect(Collectors.toList());
-    }
-
-    // Lambda 6: Đếm số lượng giáo viên đang còn hoạt động (Active)
-    public long countActiveTeachers() {
-        List<Teacher> allTeachers = getAllTeachers();
-        return allTeachers.stream()
-                .filter(t -> "Active".equalsIgnoreCase(t.getStatus()))
-                .count();
-    }
+    
 }

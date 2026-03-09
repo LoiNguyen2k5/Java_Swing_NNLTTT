@@ -36,28 +36,4 @@ public class EnrollmentDAO {
             e.printStackTrace();
         }
     }
-
-    // --- CÁC HÀM SỬ DỤNG JAVA LAMBDA (Yêu cầu của giáo viên) ---
-
-    // Lambda 1: Lọc danh sách đăng ký theo mã lớp học
-    public List<Enrollment> filterByClass(Long classId) {
-        List<Enrollment> all = getAllEnrollments(); // Lấy danh sách tổng
-        return all.stream() // Chuyển sang luồng dữ liệu (Stream)
-            .filter(e -> e.getClassId().equals(classId)) // Lọc những phần tử khớp mã lớp
-            .collect(Collectors.toList()); // Thu thập kết quả về dạng danh sách List
-    }
-
-    // Lambda 2: Tìm danh sách các đăng ký có trạng thái cụ thể (ví dụ: 'Dropped')
-    public List<Enrollment> getEnrollmentsByStatus(String status) {
-        return getAllEnrollments().stream()
-            .filter(e -> e.getStatus().equalsIgnoreCase(status)) // So sánh chuỗi không phân biệt hoa thường
-            .collect(Collectors.toList());
-    }
-
-    // Lambda 3: Đếm tổng số lượng đăng ký đã hoàn thành (Status = 'Completed')
-    public long countCompletedEnrollments() {
-        return getAllEnrollments().stream()
-            .filter(e -> "Completed".equalsIgnoreCase(e.getStatus())) // Lọc trạng thái 'Completed'
-            .count(); // Trả về số lượng đếm được
-    }
 }

@@ -1,6 +1,6 @@
 package com.mis.ui;
 
-import com.mis.dao.TeacherDAO;
+import com.mis.service.TeacherService;
 import com.mis.entity.Teacher;
 
 import javax.swing.*;
@@ -21,10 +21,10 @@ public class TeacherFrame extends JFrame {
     private JButton btnAdd, btnUpdate, btnDelete, btnRefresh;
     private JButton btnSearch, btnFilterSpecialty, btnCountActive;
 
-    private TeacherDAO teacherDAO;
+    private TeacherService teacherService;
 
     public TeacherFrame() {
-        teacherDAO = new TeacherDAO();
+        teacherService = new TeacherService();
 
         setTitle("Quản lý Giáo Viên");
         setSize(1000, 650); // Tăng chiều cao để chứa 2 dòng nút bấm
@@ -33,7 +33,7 @@ public class TeacherFrame extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents();
-        loadDataToTable(teacherDAO.getAllTeachers());
+        loadDataToTable(teacherService.getAllTeachers());
     }
 
     private void initComponents() {
@@ -158,9 +158,9 @@ public class TeacherFrame extends JFrame {
                     txtName.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim(),
                     cbSpecialty.getSelectedItem().toString(), new Date(), cbStatus.getSelectedItem().toString()
             );
-            teacherDAO.addTeacher(t);
+            teacherService.addTeacher(t);
             JOptionPane.showMessageDialog(this, "Thêm giáo viên thành công!");
-            clearForm(); loadDataToTable(teacherDAO.getAllTeachers());
+            clearForm(); loadDataToTable(teacherService.getAllTeachers());
         });
 
         btnUpdate.addActionListener(e -> {
@@ -176,9 +176,9 @@ public class TeacherFrame extends JFrame {
             t.setHireDate(new Date()); 
             t.setStatus(cbStatus.getSelectedItem().toString());
 
-            teacherDAO.updateTeacher(t);
+            teacherService.updateTeacher(t);
             JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
-            clearForm(); loadDataToTable(teacherDAO.getAllTeachers());
+            clearForm(); loadDataToTable(teacherService.getAllTeachers());
         });
 
         btnDelete.addActionListener(e -> {
@@ -186,14 +186,14 @@ public class TeacherFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Chọn giáo viên cần xóa!"); return;
             }
             if (JOptionPane.showConfirmDialog(this, "Chắc chắn xóa?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                teacherDAO.deleteTeacher(Long.parseLong(txtId.getText()));
+                teacherService.deleteTeacher(Long.parseLong(txtId.getText()));
                 JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                clearForm(); loadDataToTable(teacherDAO.getAllTeachers());
+                clearForm(); loadDataToTable(teacherService.getAllTeachers());
             }
         });
 
         btnRefresh.addActionListener(e -> {
-            clearForm(); loadDataToTable(teacherDAO.getAllTeachers());
+            clearForm(); loadDataToTable(teacherService.getAllTeachers());
         });
 
         // --- XỬ LÝ SỰ KIỆN LAMBDA ---
@@ -202,9 +202,9 @@ public class TeacherFrame extends JFrame {
         btnSearch.addActionListener(e -> {
             String keyword = txtSearch.getText().trim();
             if (keyword.isEmpty()) {
-                loadDataToTable(teacherDAO.getAllTeachers());
+                loadDataToTable(teacherService.getAllTeachers());
             } else {
-                List<Teacher> result = teacherDAO.searchTeachersByName(keyword);
+                List<Teacher> result = teacherService.searchTeachersByName(keyword);
                 loadDataToTable(result);
             }
         });
@@ -212,14 +212,14 @@ public class TeacherFrame extends JFrame {
         // Lambda 5: Lọc chuyên môn dựa trên ComboBox
         btnFilterSpecialty.addActionListener(e -> {
             String selectedSpecialty = cbSpecialty.getSelectedItem().toString();
-            List<Teacher> result = teacherDAO.getTeachersBySpecialty(selectedSpecialty);
+            List<Teacher> result = teacherService.getTeachersBySpecialty(selectedSpecialty);
             loadDataToTable(result);
             JOptionPane.showMessageDialog(this, "Đã lọc danh sách giáo viên chuyên môn: " + selectedSpecialty);
         });
 
         // Lambda 6: Đếm giáo viên Active
         btnCountActive.addActionListener(e -> {
-            long count = teacherDAO.countActiveTeachers();
+            long count = teacherService.countActiveTeachers();
             JOptionPane.showMessageDialog(this, 
                     "Tổng số Giáo viên đang hoạt động (Active) là: " + count, 
                     "Kết quả đếm (Java Lambda)", 

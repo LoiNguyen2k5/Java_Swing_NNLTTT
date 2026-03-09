@@ -1,6 +1,6 @@
 package com.mis.ui;
 
-import com.mis.dao.CourseDAO;
+import com.mis.service.CourseService;
 import com.mis.entity.Course;
 
 import javax.swing.*;
@@ -23,10 +23,10 @@ public class CourseFrame extends JFrame {
     // Nút Lambda
     private JButton btnSearch, btnFilterLevel, btnFilterFee;
 
-    private CourseDAO courseDAO;
+    private CourseService courseService;
 
     public CourseFrame() {
-        courseDAO = new CourseDAO();
+        courseService = new CourseService();
 
         setTitle("Quản lý Khóa Học");
         setSize(1000, 650);
@@ -35,7 +35,7 @@ public class CourseFrame extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents(); 
-        loadDataToTable(courseDAO.getAllCourses()); 
+        loadDataToTable(courseService.getAllCourses()); 
     }
 
     private void initComponents() {
@@ -153,9 +153,9 @@ public class CourseFrame extends JFrame {
                         txtName.getText().trim(), txtDescription.getText().trim(), cbLevel.getSelectedItem().toString(),
                         Integer.parseInt(txtDuration.getText().trim()), new BigDecimal(txtFee.getText().trim()), cbStatus.getSelectedItem().toString()
                 );
-                courseDAO.addCourse(c);
+                courseService.addCourse(c);
                 JOptionPane.showMessageDialog(this, "Thêm khóa học thành công!");
-                clearForm(); loadDataToTable(courseDAO.getAllCourses());
+                clearForm(); loadDataToTable(courseService.getAllCourses());
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Nhập đúng định dạng số cho Thời lượng và Học phí!");
             }
@@ -170,9 +170,9 @@ public class CourseFrame extends JFrame {
                 c.setLevel(cbLevel.getSelectedItem().toString()); c.setDuration(Integer.parseInt(txtDuration.getText().trim()));
                 c.setFee(new BigDecimal(txtFee.getText().trim())); c.setStatus(cbStatus.getSelectedItem().toString());
 
-                courseDAO.updateCourse(c);
+                courseService.updateCourse(c);
                 JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
-                clearForm(); loadDataToTable(courseDAO.getAllCourses());
+                clearForm(); loadDataToTable(courseService.getAllCourses());
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ!");
             }
@@ -180,13 +180,13 @@ public class CourseFrame extends JFrame {
 
         btnDelete.addActionListener(e -> {
             if (!txtId.getText().isEmpty() && JOptionPane.showConfirmDialog(this, "Chắc chắn xóa?") == 0) {
-                courseDAO.deleteCourse(Long.parseLong(txtId.getText()));
-                clearForm(); loadDataToTable(courseDAO.getAllCourses());
+                courseService.deleteCourse(Long.parseLong(txtId.getText()));
+                clearForm(); loadDataToTable(courseService.getAllCourses());
             }
         });
 
         btnRefresh.addActionListener(e -> {
-            clearForm(); loadDataToTable(courseDAO.getAllCourses());
+            clearForm(); loadDataToTable(courseService.getAllCourses());
         });
 
         // --- SỰ KIỆN LAMBDA ---
@@ -194,13 +194,13 @@ public class CourseFrame extends JFrame {
         // Lambda 1: Tìm theo tên
         btnSearch.addActionListener(e -> {
             String keyword = txtSearch.getText().trim();
-            loadDataToTable(keyword.isEmpty() ? courseDAO.getAllCourses() : courseDAO.searchCoursesByName(keyword));
+            loadDataToTable(keyword.isEmpty() ? courseService.getAllCourses() : courseService.searchCoursesByName(keyword));
         });
 
         // Lambda 2: Lọc theo Cấp độ (Level) đang được chọn ở ComboBox
         btnFilterLevel.addActionListener(e -> {
             String selectedLevel = cbLevel.getSelectedItem().toString();
-            List<Course> result = courseDAO.filterCoursesByLevel(selectedLevel);
+            List<Course> result = courseService.filterCoursesByLevel(selectedLevel);
             loadDataToTable(result);
             JOptionPane.showMessageDialog(this, "Đã lọc khóa học có cấp độ: " + selectedLevel);
         });
@@ -212,7 +212,7 @@ public class CourseFrame extends JFrame {
             if (input != null && !input.trim().isEmpty()) {
                 try {
                     double maxFee = Double.parseDouble(input.trim());
-                    List<Course> result = courseDAO.getCoursesCheaperThan(maxFee);
+                    List<Course> result = courseService.getCoursesCheaperThan(maxFee);
                     loadDataToTable(result);
                     if (result.isEmpty()) {
                         JOptionPane.showMessageDialog(this, "Không tìm thấy khóa học nào có giá dưới " + maxFee + " VND");

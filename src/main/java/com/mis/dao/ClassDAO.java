@@ -60,20 +60,4 @@ public class ClassDAO {
         }
     }
 
-
-    // Lambda Tìm kiếm tên lớp
-    public List<SchoolClass> searchClassByName(String keyword) {
-        List<SchoolClass> allClasses = getAllClasses();
-        return allClasses.stream()
-                .filter(c -> c.getClassName().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    // Lambda lọc lớp học theo Trạng thái (VD: Đang diễn ra "Ongoing")
-    public List<SchoolClass> getClassesByStatus(String status) {
-        List<SchoolClass> allClasses = getAllClasses();
-        return allClasses.stream()
-                .filter(c -> c.getStatus().equalsIgnoreCase(status))
-                .collect(Collectors.toList());
-    }
 }

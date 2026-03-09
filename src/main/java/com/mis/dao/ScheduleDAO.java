@@ -5,7 +5,6 @@ import com.mis.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ScheduleDAO {
     // Lấy toàn bộ danh sách lịch học
@@ -28,10 +27,19 @@ public class ScheduleDAO {
         }
     }
 
-    // Lambda: Lọc lịch học theo mã lớp
-    public List<Schedule> filterByClass(Long classId) {
-        return getAll().stream()
-            .filter(s -> s.getClassId().equals(classId))
-            .collect(Collectors.toList());
+    // Hàm XÓA lịch học
+    public void delete(Long id) {
+        Transaction tr = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tr = session.beginTransaction();
+            Schedule s = session.get(Schedule.class, id);
+            if (s != null) {
+                session.remove(s);
+            }
+            tr.commit();
+        } catch (Exception e) {
+            if (tr != null) tr.rollback();
+            e.printStackTrace();
+        }
     }
 }

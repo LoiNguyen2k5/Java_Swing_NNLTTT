@@ -1,6 +1,6 @@
 package com.mis.ui;
 
-import com.mis.dao.AttendanceDAO;
+import com.mis.service.AttendanceService;
 import com.mis.entity.Attendance;
 
 import javax.swing.*;
@@ -15,11 +15,11 @@ public class AttendanceFrame extends JFrame {
     private DefaultTableModel model;
     private JTextField txtStudentId, txtClassId, txtDate, txtNote, txtSearchStudent;
     private JComboBox<String> cbStatus;
-    private AttendanceDAO attendanceDAO;
+    private AttendanceService attendanceService;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     public AttendanceFrame() {
-        attendanceDAO = new AttendanceDAO();
+        attendanceService = new AttendanceService();
         setTitle("Quản lý Điểm danh");
         setSize(1000, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Đóng cửa sổ riêng lẻ
@@ -27,7 +27,7 @@ public class AttendanceFrame extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents();
-        loadData(attendanceDAO.getAllAttendances()); // Tải dữ liệu ban đầu
+        loadData(attendanceService.getAllAttendances()); // Tải dữ liệu ban đầu
     }
 
     private void initComponents() {
@@ -74,6 +74,7 @@ public class AttendanceFrame extends JFrame {
         // --- XỬ LÝ SỰ KIỆN ---
 
         // Lưu điểm danh mới
+      // Lưu điểm danh mới
         btnSave.addActionListener(e -> {
             try {
                 Attendance a = new Attendance(
@@ -83,11 +84,16 @@ public class AttendanceFrame extends JFrame {
                     cbStatus.getSelectedItem().toString(),
                     txtNote.getText()
                 );
-                attendanceDAO.saveOrUpdate(a);
+                attendanceService.saveOrUpdate(a);
                 JOptionPane.showMessageDialog(this, "Ghi nhận thành công!");
-                loadData(attendanceDAO.getAllAttendances());
+                loadData(attendanceService.getAllAttendances());
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: Mã Học Viên và Mã Lớp phải là số nguyên!", "Sai định dạng số", JOptionPane.WARNING_MESSAGE);
+            } catch (java.text.ParseException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: Ngày điểm danh phải đúng định dạng yyyy-MM-dd!", "Sai định dạng ngày", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi định dạng: yyyy-MM-dd và ID phải là số!");
+                JOptionPane.showMessageDialog(this, "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -95,14 +101,14 @@ public class AttendanceFrame extends JFrame {
         btnCountAbsence.addActionListener(e -> {
             try {
                 Long sId = Long.parseLong(txtSearchStudent.getText());
-                long count = attendanceDAO.countAbsencesByStudent(sId); // Gọi hàm Lambda đếm
+                long count = attendanceService.countAbsencesByStudent(sId); // Gọi hàm Lambda đếm
                 JOptionPane.showMessageDialog(this, "Học viên " + sId + " đã vắng mặt: " + count + " buổi.");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập mã học viên hợp lệ!");
             }
         });
 
-        btnRefresh.addActionListener(e -> loadData(attendanceDAO.getAllAttendances()));
+        btnRefresh.addActionListener(e -> loadData(attendanceService.getAllAttendances()));
     }
 
     private void loadData(List<Attendance> list) {

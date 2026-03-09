@@ -72,32 +72,4 @@ public class StudentDAO {
             e.printStackTrace();
         }
     }
-
-
-    // Yêu cầu Lambda 1: Lọc học viên theo trạng thái (Ví dụ: "Active")
-    public List<Student> getStudentsByStatus(String status) {
-        List<Student> allStudents = getAllStudents();
-        // Dùng Stream API để filter dữ liệu và thu thập lại thành List
-        return allStudents.stream()
-                .filter(s -> s.getStatus().equalsIgnoreCase(status))
-                .collect(Collectors.toList());
-    }
-
-    // Yêu cầu Lambda 2: Tìm kiếm học viên theo Tên (Tìm gần đúng)
-    public List<Student> searchStudentsByName(String keyword) {
-        List<Student> allStudents = getAllStudents();
-        // Lọc các học viên có Tên chứa từ khóa keyword (bỏ qua chữ hoa chữ thường)
-        return allStudents.stream()
-                .filter(s -> s.getFullName().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    // Yêu cầu Lambda 3: Đếm số lượng học viên Nam (Male)
-    public long countMaleStudents() {
-        List<Student> allStudents = getAllStudents();
-        // Đếm (count) các đối tượng có gender là "Male"
-        return allStudents.stream()
-                .filter(s -> "Male".equalsIgnoreCase(s.getGender()))
-                .count();
-    }
 }

@@ -34,28 +34,4 @@ public class AttendanceDAO {
             e.printStackTrace();
         }
     }
-
-    // --- CÁC HÀM SỬ DỤNG JAVA LAMBDA (Đáp ứng yêu cầu GV) ---
-
-    // Lambda 1: Lọc danh sách điểm danh theo mã lớp
-    public List<Attendance> filterByClass(Long classId) {
-        return getAllAttendances().stream()
-            .filter(a -> a.getClassId().equals(classId))
-            .collect(Collectors.toList());
-    }
-
-    // Lambda 2: Đếm số buổi vắng mặt (Absent) của một học viên cụ thể
-    public long countAbsencesByStudent(Long studentId) {
-        return getAllAttendances().stream()
-            .filter(a -> a.getStudentId().equals(studentId))
-            .filter(a -> "Absent".equalsIgnoreCase(a.getStatus())) // Chỉ lọc những buổi vắng
-            .count(); // Sử dụng hàm count() của Stream API
-    }
-
-    // Lambda 3: Tìm danh sách học viên đi trễ (Late) trong một ngày cụ thể
-    public List<Attendance> getLateStudentsByDate(java.util.Date date) {
-        return getAllAttendances().stream()
-            .filter(a -> a.getAttendDate().equals(date) && "Late".equalsIgnoreCase(a.getStatus()))
-            .collect(Collectors.toList());
-    }
 }
